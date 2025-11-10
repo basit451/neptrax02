@@ -1,61 +1,46 @@
-import { useEffect, useRef, ReactNode } from 'react';
+import { motion, useAnimation } from 'framer-motion';
+import { useInView } from 'react-intersection-observer';
+import { useEffect, ReactNode } from 'react';
 
 interface ScrollRevealProps {
   children: ReactNode;
   delay?: number;
-  direction?: 'up' | 'down' | 'left' | 'right';
-  className?: string;
+  y?: number;
+  duration?: number;
 }
 
 export default function ScrollReveal({
   children,
   delay = 0,
-  direction = 'up',
-  className = ''
+  y = 50,
+  duration = 0.6,
 }: ScrollRevealProps) {
-  const elementRef = useRef<HTMLDivElement>(null);
+  const controls = useAnimation();
+  const [ref, inView] = useInView({
+    threshold: 0.15,
+    triggerOnce: false,
+  });
 
   useEffect(() => {
-    const element = elementRef.current;
-    if (!element) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            setTimeout(() => {
-              element.classList.add('reveal-visible');
-            }, delay);
-            observer.unobserve(element);
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    observer.observe(element);
-
-    return () => observer.disconnect();
-  }, [delay]);
-
-  const getDirectionClass = () => {
-    switch (direction) {
-      case 'up':
-        return 'reveal-up';
-      case 'down':
-        return 'reveal-down';
-      case 'left':
-        return 'reveal-left';
-      case 'right':
-        return 'reveal-right';
-      default:
-        return 'reveal-up';
+    if (inView) {
+      controls.start('visible');
+    } else {
+      controls.start('hidden');
     }
-  };
+  }, [controls, inView]);
 
   return (
-    <div ref={elementRef} className={`reveal ${getDirectionClass()} ${className}`}>
+    <motion.div
+      ref={ref}
+      initial="hidden"
+      animate={controls}
+      transition={{ duration, delay, ease: 'easeOut' }}
+      variants={{
+        hidden: { opacity: 0, y },
+        visible: { opacity: 1, y: 0 },
+      }}
+    >
       {children}
-    </div>
+    </motion.div>
   );
 }
