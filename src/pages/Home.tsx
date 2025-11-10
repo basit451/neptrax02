@@ -1,6 +1,7 @@
 import { Sparkles, Rocket, ShoppingCart, Briefcase, Users, Code, Palette, Search, Target, Layers, Wrench, TrendingUp, ArrowUpRight } from 'lucide-react';
 import Silk from '../components/Silk';
 import StarBorder from '../components/StarBorder';
+import MissionSection from '../components/MissionSection';
 
 interface HomeProps {
   onNavigate: (section: string) => void;
@@ -112,6 +113,8 @@ export default function Home({ onNavigate }: HomeProps) {
           </div>
         </div>
       </section>
+
+      <MissionSection />
 
       <section className="py-20 bg-[#0d1117]">
         <div className="max-w-7xl mx-auto px-6">
